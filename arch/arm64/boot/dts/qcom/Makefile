@@ -47,6 +47,12 @@ dtbo-$(CONFIG_CHANNEL_DTB) += \
 
 dtbo-$(CONFIG_SURFNA_DTB) += msm8940-surfna-evt-overlay.dtbo
 
+dtb-$(CONFIG_SANDERS_DTB) += \
+	msm8953-sanders-p1.dtb \
+	msm8953-sanders-p2.dtb \
+	msm8953-sanders-p3.dtb \
+	msm8953-sanders-p4.dtb
+
 sdm450-ali-evt-overlay.dtbo-base := \
 		sdm450-ali-base.dtb
 
