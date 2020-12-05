@@ -863,7 +863,6 @@ typedef struct hdd_hostapd_state_s
     int bssState;
     vos_event_t vosEvent;
     VOS_STATUS vosStatus;
-    vos_event_t sta_discon_event;
     v_BOOL_t bCommit; 
 
 } hdd_hostapd_state_t;
@@ -2022,6 +2021,7 @@ void wlan_hdd_reset_prob_rspies(hdd_adapter_t* pHostapdAdapter);
 void hdd_prevent_suspend(uint32_t reason);
 void hdd_allow_suspend(uint32_t reason);
 void hdd_prevent_suspend_timeout(v_U32_t timeout, uint32_t reason);
+void hdd_prevent_suspend_after_scan(long hz); //Mot IKHSS7-28961 :Empty scan results
 bool hdd_is_ssr_required(void);
 void hdd_set_ssr_required(e_hdd_ssr_required value);
 void hdd_set_pre_close(hdd_context_t *pHddCtx);

@@ -23,12 +23,6 @@ ifeq ($(KERNEL_BUILD), 0)
 #Flag to enable Legacy Fast Roaming(LFR)
     CONFIG_PRIMA_WLAN_LFR := y
 
-#Flag to enable SAE
-    CONFIG_WLAN_FEATURE_SAE := y
-
-#Flag to enable OWE
-    CONFIG_WLAN_AKM_SUITE_OWE := y
-
 #Flag to enable Legacy Fast Roaming(LFR) Make Before Break
     CONFIG_PRIMA_WLAN_LFR_MBB := y
 
@@ -67,8 +61,8 @@ SAP_AUTH_OFFLOAD := y
 
 # To enable CONFIG_QCOM_ESE_UPLOAD, dependent config
 # CONFIG_QCOM_ESE must be enabled.
-CONFIG_QCOM_ESE := n
-CONFIG_QCOM_ESE_UPLOAD := n
+CONFIG_QCOM_ESE := y
+CONFIG_QCOM_ESE_UPLOAD := y
 
 # Feature flags which are not (currently) configurable via Kconfig
 
@@ -106,9 +100,9 @@ else
 endif # ANDROID_BUILD_TOP
 else
 ifneq ($(ANDROID_BUILD_TOP),)
-    WLAN_BLD_DIR := $(ANDROID_BUILD_TOP)/device/qcom/sdm429w/common/opensource/wlan
+    WLAN_BLD_DIR := $(ANDROID_BUILD_TOP)/device/qcom/msm8909w/opensource/wlan
 else
-    WLAN_BLD_DIR := $(BOARD_OPENSOURCE_DIR)/wlan
+    WLAN_BLD_DIR := device/qcom/msm8909w/opensource/wlan
 endif # ANDROID_BUILD_TOP
 endif # TARGET_SUPPORTS_WEARABLES
 endif # WLAN_PROPRIETARY
@@ -622,7 +616,6 @@ CDEFINES :=	-DANI_BUS_TYPE_PLATFORM=1 \
                 -DFEATURE_WLAN_PAL_TIMER_DISABLE \
                 -DFEATURE_WLAN_PAL_MEM_DISABLE \
                 -DFEATURE_WLAN_CH144 \
-                -DWLAN_BUG_ON_SKB_ERROR \
                 -DWLAN_DXE_LOW_RESOURCE_TIMER \
                 -DWLAN_LOGGING_SOCK_SVC_ENABLE \
                 -DWLAN_FEATURE_LINK_LAYER_STATS \
@@ -681,18 +674,28 @@ endif
 
 ifeq ($(CONFIG_PRIMA_WLAN_LFR),y)
 CDEFINES += -DFEATURE_WLAN_LFR
-endif
-
-ifeq ($(CONFIG_WLAN_FEATURE_SAE),y)
-CDEFINES += -DWLAN_FEATURE_SAE
-endif
-
-ifeq ($(CONFIG_WLAN_AKM_SUITE_OWE),y)
-CDEFINES += -DWLAN_AKM_SUITE_OWE
+#Begin fjdw67 Motorola, IKJB42MAIN-6385 - LFR roaming instrumentation
+CDEFINES += -DFEATURE_WLAN_LFR_METRICS
+#End IKJB42MAIN-6385
 endif
 
 ifeq ($(CONFIG_PRIMA_WLAN_LFR_MBB),y)
 CDEFINES += -DWLAN_FEATURE_LFR_MBB
+endif
+
+# WLAN_WHITE_LIST - WLAN Radiated Power Test
+# For user software build, wlan driver needs to allow the factory
+# commnds only for Tx_opcode and NART commands based off 12M doc
+# commans whitelisted are :
+# set RF channel
+# set internal configuration
+# enable scpc mode
+# set data rate preamble frame number spacinf and playlod
+# set Tx Power
+# turn on Tx
+# turn off Tx
+ifeq ($(TARGET_BUILD_VARIANT),user)
+CDEFINES += -DWLAN_WHITE_LIST
 endif
 
 ifeq ($(CONFIG_PRIMA_WLAN_OKC),y)
@@ -711,6 +714,9 @@ endif
 
 # enable the MAC Address auto-generation feature
 CDEFINES += -DWLAN_AUTOGEN_MACADDR_FEATURE
+
+# Moto read MACs from boot params instead of NV file
+CDEFINES += -DMOTO_UTAGS_MAC
 
 ifeq ($(CONFIG_WLAN_FEATURE_11W),y)
 CDEFINES += -DWLAN_FEATURE_11W
@@ -760,7 +766,7 @@ CDEFINES += -DEXISTS_MSM_SMSM
 endif
 
 # Fix build for GCC 4.7
-EXTRA_CFLAGS += $(call cc-option,-Wno-maybe-uninitialized) -Wno-unused-function -Wno-enum-conversion -Wno-array-bounds -Wno-pointer-bool-conversion -Wno-parentheses-equality -Wno-typedef-redefinition -Wno-empty-body -Wno-non-literal-null-conversion
+EXTRA_CFLAGS += -Wno-unused-function
 
 ifeq ($(CONFIG_WLAN_OFFLOAD_PACKETS),y)
 CDEFINES += -DWLAN_FEATURE_OFFLOAD_PACKETS
@@ -776,3 +782,12 @@ KBUILD_CPPFLAGS += $(CDEFINES)
 obj-$(CONFIG_PRIMA_WLAN) += $(MODNAME).o
 obj-$(CONFIG_PRONTO_WLAN) += $(MODNAME).o
 $(MODNAME)-y := $(OBJS)
+
+subdir-ccflags-y += \
+	-Wno-array-bounds \
+	-Wno-empty-body \
+	-Wno-enum-conversion \
+	-Wno-non-literal-null-conversion \
+	-Wno-parentheses-equality \
+	-Wno-pointer-bool-conversion \
+	-Wno-typedef-redefinition
