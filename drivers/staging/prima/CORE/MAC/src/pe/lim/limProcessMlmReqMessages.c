@@ -4041,7 +4041,7 @@ tLimMlmRemoveKeyCnf  mlmRemoveKeyCnf;
   
 
 
-    psessionEntry->limMlmState = eLIM_MLM_WT_REMOVE_STA_KEY_STATE;
+  psessionEntry->limMlmState = eLIM_MLM_WT_REMOVE_STA_KEY_STATE;
     MTRACE(macTrace(pMac, TRACE_CODE_MLM_STATE, psessionEntry->peSessionId, psessionEntry->limMlmState));
 
     // Package WDA_REMOVE_STAKEY_REQ message parameters
@@ -4402,7 +4402,7 @@ limProcessJoinFailureTimeout(tpAniSirGlobal pMac)
         MTRACE(macTrace(pMac, TRACE_CODE_MLM_STATE, psessionEntry->peSessionId, psessionEntry->limMlmState));
         if(limSetLinkState(pMac, eSIR_LINK_IDLE_STATE, psessionEntry->bssId, 
             psessionEntry->selfMacAddr, NULL, NULL) != eSIR_SUCCESS)
-            PELOGE(limLog(pMac, LOGE,  FL("Failed to set the LinkState"));)
+        PELOGE(limLog(pMac, LOGE,  FL("Failed to set the LinkState"));)
         /* Update PE session Id */
         mlmJoinCnf.sessionId = psessionEntry->peSessionId;
         
