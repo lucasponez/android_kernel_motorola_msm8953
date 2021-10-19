@@ -1,3 +1,7 @@
+ifeq ($(cc-name),clang)
+EXTRA_CFLAGS += $(call cc-disable-warning, implicit-function-declaration, int-conversion)
+endif
+
 #
 # Makefile for the kernel character device drivers.
 #

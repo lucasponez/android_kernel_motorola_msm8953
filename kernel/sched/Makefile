@@ -1,3 +1,7 @@
+ifeq ($(cc-name),clang)
+EXTRA_CFLAGS += $(call cc-disable-warning, implicit-function-declaration, constant-logical-operand)
+endif
+
 ifdef CONFIG_FUNCTION_TRACER
 CFLAGS_REMOVE_clock.o = $(CC_FLAGS_FTRACE)
 endif
